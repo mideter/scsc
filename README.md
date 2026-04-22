@@ -1,6 +1,6 @@
 # scsc
 
-Simple client/server C++  (CMake).
+Simple client/server C++.
 
 ## Build
 
