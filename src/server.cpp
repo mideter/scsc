@@ -18,11 +18,6 @@ namespace {
 }
 
 
-void print_errno(const std::string& message) {
-	std::cerr << message << ": " << std::strerror(errno) << '\n';
-}
-
-
 void send_all(int fd, const char* data, size_t len) {
 	size_t sent = 0;
 
@@ -40,19 +35,64 @@ void send_all(int fd, const char* data, size_t len) {
 }
 
 
+class SocketHandle {
+public:
+	SocketHandle() 
+		: fd_(::socket(AF_INET, SOCK_STREAM, 0)) 
+	{
+		if (fd_ < 0)
+			throw_errno("socket failed");
+	}
+
+	explicit SocketHandle(int fd) 
+		: fd_(fd) 
+	{
+		if (fd_ < 0)
+			throw_errno("socket failed");
+	}
+
+	~SocketHandle() {
+		if (fd_ >= 0)
+			::close(fd_);
+	}
+
+	SocketHandle(const SocketHandle&) = delete;
+	SocketHandle& operator=(const SocketHandle&) = delete;
+
+	SocketHandle(SocketHandle&& other) noexcept : fd_(other.fd_) {
+		other.fd_ = -1;
+	}
+
+	SocketHandle& operator=(SocketHandle&& other) noexcept {
+		if (this != &other) {
+			if (fd_ >= 0)
+				::close(fd_);
+
+			fd_ = other.fd_;
+			other.fd_ = -1;
+		}
+
+		return *this;
+	}
+
+	int get() const { 
+		return fd_; 
+	}
+
+private:
+	int fd_;
+};
+
+
 class EchoServer {
 public:
 	explicit EchoServer(int port) : port_(port) {}
 
 	void run() const {
-		const int server_fd = ::socket(AF_INET, SOCK_STREAM, 0);
-		if (server_fd < 0) {
-			throw_errno("socket failed");
-		}
+		SocketHandle server_socket;
 
 		int opt = 1;
-		if (::setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-			::close(server_fd);
+		if (::setsockopt(server_socket.get(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
 			throw_errno("setsockopt failed");
 		}
 
@@ -61,38 +101,32 @@ public:
 		server_addr.sin_addr.s_addr = INADDR_ANY;
 		server_addr.sin_port = htons(port_);
 
-		if (::bind(server_fd, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
-			::close(server_fd);
+		if (::bind(server_socket.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
 			throw_errno("bind failed");
 		}
 
-		if (::listen(server_fd, Backlog) < 0) {
-			::close(server_fd);
+		if (::listen(server_socket.get(), Backlog) < 0) {
 			throw_errno("listen failed");
 		}
 
 		std::cout << "Echo server on port " << port_ << " (Ctrl+C to stop)\n";
 
 		for (;;) {
-			sockaddr_in client_addr{};
-			socklen_t client_len = sizeof(client_addr);
-			const int client_fd = ::accept(server_fd, reinterpret_cast<sockaddr*>(&client_addr), &client_len);
-			if (client_fd < 0) {
-				print_errno("accept failed");
-				continue;
-			}
-
-			char ip[INET_ADDRSTRLEN] = {0};
-			::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
-			std::cout << "Client " << ip << ":" << ntohs(client_addr.sin_port) << " connected\n";
-
 			try {
-				handle_client(client_fd);
-			} catch (const std::exception& e) {
+				sockaddr_in client_addr{};
+				socklen_t client_len = sizeof(client_addr);
+				SocketHandle client_socket(::accept(server_socket.get(), reinterpret_cast<sockaddr*>(&client_addr), &client_len));
+
+				char ip[INET_ADDRSTRLEN] = {0};
+				::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
+				std::cout << "Client " << ip << ":" << ntohs(client_addr.sin_port) << " connected\n";
+
+				handle_client(client_socket.get());
+			} 
+			catch (const std::exception& e) {
 				std::cerr << "Client error: " << e.what() << '\n';
 			}
 
-			::close(client_fd);
 			std::cout << "Client disconnected\n";
 		}
 	}
