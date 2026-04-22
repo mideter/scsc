@@ -13,7 +13,8 @@ namespace {
 
 
 constexpr int kPort = 8080;
-constexpr const char* kServerIp = "127.0.0.1";
+// constexpr const char* kServerIp = "127.0.0.1";
+constexpr const char* kServerIp = "139.59.117.130";
 
 void print_errno(const std::string& message) {
 	std::cerr << message << ": " << std::strerror(errno) << '\n';
@@ -46,7 +47,7 @@ int main() {
 		return 1;
 	}
 
-	const std::string message = "Hello from client!";
+	const std::string message = "Hello, I want to get it back!";
 	if (::send(sock, message.c_str(), message.size(), 0) < 0) {
 		print_errno("send failed");
 		::close(sock);

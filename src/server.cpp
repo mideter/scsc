@@ -22,6 +22,42 @@ void print_errno(const std::string& message) {
 }
 
 
+bool send_all(int fd, const char* data, size_t len) {
+	size_t sent = 0;
+	while (sent < len) {
+		const ssize_t n = ::send(fd, data + sent, len - sent, 0);
+		if (n < 0) {
+			print_errno("send failed");
+			return false;
+		}
+		if (n == 0) {
+			return false;
+		}
+		sent += static_cast<size_t>(n);
+	}
+	return true;
+}
+
+
+void handle_client(int client_fd) {
+	char buffer[kBufferSize];
+
+	for (;;) {
+		const ssize_t n = ::recv(client_fd, buffer, sizeof(buffer), 0);
+		if (n < 0) {
+			print_errno("recv failed");
+			break;
+		}
+		if (n == 0) {
+			break;
+		}
+		if (!send_all(client_fd, buffer, static_cast<size_t>(n))) {
+			break;
+		}
+	}
+}
+
+
 }  // namespace
 
 
@@ -56,46 +92,24 @@ int main() {
 		return 1;
 	}
 
-	std::cout << "Server started on port " << kPort << '\n';
-	std::cout << "Waiting for one client...\n";
+	std::cout << "Echo server on port " << kPort << " (Ctrl+C to stop)\n";
 
-	sockaddr_in client_addr{};
-	socklen_t client_len = sizeof(client_addr);
-	const int client_fd = ::accept(server_fd, reinterpret_cast<sockaddr*>(&client_addr), &client_len);
-	if (client_fd < 0) {
-		print_errno("accept failed");
-		::close(server_fd);
-		return 1;
-	}
+	for (;;) {
+		sockaddr_in client_addr{};
+		socklen_t client_len = sizeof(client_addr);
+		const int client_fd = ::accept(server_fd, reinterpret_cast<sockaddr*>(&client_addr), &client_len);
+		if (client_fd < 0) {
+			print_errno("accept failed");
+			continue;
+		}
 
-	char ip[INET_ADDRSTRLEN] = {0};
-	::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
-	std::cout << "Client connected from " << ip << ":" << ntohs(client_addr.sin_port) << '\n';
+		char ip[INET_ADDRSTRLEN] = {0};
+		::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
+		std::cout << "Client " << ip << ":" << ntohs(client_addr.sin_port) << " connected\n";
 
-	char buffer[kBufferSize] = {0};
-	const ssize_t bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-	if (bytes_received < 0) {
-		print_errno("recv failed");
+		handle_client(client_fd);
+
 		::close(client_fd);
-		::close(server_fd);
-		return 1;
+		std::cout << "Client disconnected\n";
 	}
-
-	buffer[bytes_received] = '\0';
-	std::cout << "Received: " << buffer << '\n';
-
-	const std::string response = "Hello from server!";
-	if (::send(client_fd, response.c_str(), response.size(), 0) < 0) {
-		print_errno("send failed");
-		::close(client_fd);
-		::close(server_fd);
-		return 1;
-	}
-
-	std::cout << "Response sent. Shutting down.\n";
-
-	::close(client_fd);
-	::close(server_fd);
-	return 0;
 }
-

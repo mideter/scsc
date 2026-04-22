@@ -24,5 +24,5 @@ Open two terminals:
 
 Expected flow:
 - client sends: `Hello from client!`
-- server replies: `Hello from server!`
+- server echoes the same bytes back (TCP echo server)
 
