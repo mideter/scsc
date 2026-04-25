@@ -1,6 +1,5 @@
 #include "echoserver.h"
 
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 
@@ -28,10 +27,13 @@ void send_all(int fd, const char* data, std::size_t len)
 	std::size_t sent = 0;
 	while (sent < len) {
 		const ssize_t n = ::send(fd, data + sent, len - sent, 0);
+		
 		if (n < 0)
 			throw_errno("send failed");
+		
 		if (n == 0)
 			throw std::runtime_error("send failed: connection closed");
+		
 		sent += static_cast<std::size_t>(n);
 	}
 }
@@ -70,10 +72,10 @@ void EchoServer::bind_and_listen(const SocketHandle& server_socket) const
 }
 
 
-SocketHandle EchoServer::accept_client(const SocketHandle& server_socket, sockaddr_in& client_addr) const
+SocketHandle EchoServer::accept_client(const SocketHandle& server_socket, ClientAddress& client_addr) const
 {
-	socklen_t client_len = sizeof(client_addr);
-	return SocketHandle(::accept(server_socket.get(), reinterpret_cast<sockaddr*>(&client_addr), &client_len));
+	socklen_t client_len = client_addr.sockaddr_size();
+	return SocketHandle(::accept(server_socket.get(), client_addr.sockaddr_ptr(), &client_len));
 }
 
 
@@ -81,7 +83,7 @@ void EchoServer::serve_clients(const SocketHandle& server_socket) const
 {
 	for (;;) {
 		try {
-			sockaddr_in client_addr{};
+			ClientAddress client_addr;
 			SocketHandle client_socket = accept_client(server_socket, client_addr);
 
 			log_client_connected(client_addr);
@@ -96,11 +98,9 @@ void EchoServer::serve_clients(const SocketHandle& server_socket) const
 }
 
 
-void EchoServer::log_client_connected(const sockaddr_in& client_addr)
+void EchoServer::log_client_connected(const ClientAddress& client_addr)
 {
-	char ip[INET_ADDRSTRLEN] = {0};
-	::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
-	std::cout << "Client " << ip << ":" << ntohs(client_addr.sin_port) << " connected\n";
+	std::cout << "Client " << client_addr.ip_string() << ":" << client_addr.port() << " connected\n";
 }
 
 
@@ -117,12 +117,15 @@ void EchoServer::run() const
 void EchoServer::handle_client(int client_fd)
 {
 	char buffer[BufferSize];
-	for (;;) {
+	while (true) {
 		const ssize_t n = ::recv(client_fd, buffer, sizeof(buffer), 0);
+		
 		if (n < 0)
 			throw_errno("recv failed");
+		
 		if (n == 0)
 			break;
+
 		send_all(client_fd, buffer, static_cast<std::size_t>(n));
 	}
 }
