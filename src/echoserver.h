@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-#include "clientaddress.h"
+#include "clientconnection.h"
 #include "port.h"
 
 class SocketHandle;
@@ -17,9 +17,9 @@ public:
 private:
 	SocketHandle create_listen_socket() const;
 	void bind_and_listen(const SocketHandle& server_socket) const;
-	SocketHandle accept_client(const SocketHandle& server_socket, ClientAddress& client_addr) const;
+	ClientConnection accept_client(const SocketHandle& server_socket) const;
 	void serve_clients(const SocketHandle& server_socket) const;
-	static void log_client_connected(const ClientAddress& client_addr);
+	static void log_client_connected(const ClientConnection& client_connection);
 	static void handle_client(int client_fd);
 
 	static constexpr std::size_t BufferSize = 1024;

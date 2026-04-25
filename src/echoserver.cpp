@@ -64,10 +64,9 @@ void EchoServer::bind_and_listen(const SocketHandle& server_socket) const
 }
 
 
-SocketHandle EchoServer::accept_client(const SocketHandle& server_socket, ClientAddress& client_addr) const
+ClientConnection EchoServer::accept_client(const SocketHandle& server_socket) const
 {
-	socklen_t client_len = client_addr.sockaddr_size();
-	return SocketHandle(::accept(server_socket.get(), client_addr.sockaddr_ptr(), &client_len));
+	return ClientConnection::accept_from(server_socket);
 }
 
 
@@ -75,11 +74,10 @@ void EchoServer::serve_clients(const SocketHandle& server_socket) const
 {
 	for (;;) {
 		try {
-			ClientAddress client_addr;
-			SocketHandle client_socket = accept_client(server_socket, client_addr);
+			ClientConnection client_connection = accept_client(server_socket);
 
-			log_client_connected(client_addr);
-			handle_client(client_socket.get());
+			log_client_connected(client_connection);
+			handle_client(client_connection.socket_fd());
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Client error: " << e.what() << '\n';
@@ -90,9 +88,14 @@ void EchoServer::serve_clients(const SocketHandle& server_socket) const
 }
 
 
-void EchoServer::log_client_connected(const ClientAddress& client_addr)
+void EchoServer::log_client_connected(const ClientConnection& client_connection)
 {
-	std::cout << "Client " << client_addr.ip_string() << ":" << client_addr.port() << " connected\n";
+	std::cout
+		<< "Client "
+		<< client_connection.address().ip_string()
+		<< ":"
+		<< client_connection.address().port()
+		<< " connected\n";
 }
 
 
