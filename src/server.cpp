@@ -1,13 +1,14 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <unistd.h>
 
 #include <cerrno>
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <system_error>
+
+#include "sockethandle.h"
 
 
 namespace {
@@ -35,61 +36,12 @@ void send_all(int fd, const char* data, size_t len) {
 }
 
 
-class SocketHandle {
-public:
-	SocketHandle() 
-		: fd_(::socket(AF_INET, SOCK_STREAM, 0)) 
-	{
-		if (fd_ < 0)
-			throw_errno("socket failed");
-	}
-
-	explicit SocketHandle(int fd) 
-		: fd_(fd) 
-	{
-		if (fd_ < 0)
-			throw_errno("socket failed");
-	}
-
-	~SocketHandle() {
-		if (fd_ >= 0)
-			::close(fd_);
-	}
-
-	SocketHandle(const SocketHandle&) = delete;
-	SocketHandle& operator=(const SocketHandle&) = delete;
-
-	SocketHandle(SocketHandle&& other) noexcept : fd_(other.fd_) {
-		other.fd_ = -1;
-	}
-
-	SocketHandle& operator=(SocketHandle&& other) noexcept {
-		if (this != &other) {
-			if (fd_ >= 0)
-				::close(fd_);
-
-			fd_ = other.fd_;
-			other.fd_ = -1;
-		}
-
-		return *this;
-	}
-
-	int get() const { 
-		return fd_; 
-	}
-
-private:
-	int fd_;
-};
-
-
 class EchoServer {
 public:
 	explicit EchoServer(int port) : port_(port) {}
 
 	void run() const {
-		SocketHandle server_socket;
+		SocketHandle server_socket(::socket(AF_INET, SOCK_STREAM, 0));
 
 		int opt = 1;
 		if (::setsockopt(server_socket.get(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
