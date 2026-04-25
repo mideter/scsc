@@ -13,26 +13,23 @@
 #include "sockethandle.h"
 
 
-namespace {
+class SingaporeServer {
+public:
+	inline static const Port Port{8080};
+	inline static const IPv4Address Ip{"139.59.117.130"};
+};
 
 
-const Port kPort(8080);
-// constexpr const char* kServerIp = "127.0.0.1";
-constexpr const char* kServerIp = "139.59.117.130";
 
 void print_errno(const std::string& message) {
 	std::cerr << message << ": " << std::strerror(errno) << '\n';
 }
 
 
-}  // namespace
-
-
 int main()
 try {
 	SocketHandle sock(::socket(AF_INET, SOCK_STREAM, 0));
-	const IPv4Address server_ip(kServerIp);
-	const ServerAddress server_address(server_ip, kPort);
+	const ServerAddress server_address(SingaporeServer::Ip, SingaporeServer::Port);
 	sockaddr_in server_addr = server_address.value();
 
 	if (::connect(sock.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
