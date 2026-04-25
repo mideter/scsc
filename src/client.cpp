@@ -8,13 +8,14 @@
 #include <string>
 
 #include "ipv4address.h"
+#include "port.h"
 #include "sockethandle.h"
 
 
 namespace {
 
 
-constexpr int kPort = 8080;
+const Port kPort(8080);
 // constexpr const char* kServerIp = "127.0.0.1";
 constexpr const char* kServerIp = "139.59.117.130";
 
@@ -32,7 +33,7 @@ try {
 
 	sockaddr_in server_addr{};
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(kPort);
+	server_addr.sin_port = kPort.network_order();
 
 	const IPv4Address server_ip(kServerIp);
 	server_addr.sin_addr = server_ip.value();

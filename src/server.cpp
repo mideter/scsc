@@ -8,6 +8,7 @@
 #include <string>
 #include <system_error>
 
+#include "port.h"
 #include "sockethandle.h"
 
 
@@ -38,7 +39,7 @@ void send_all(int fd, const char* data, size_t len) {
 
 class EchoServer {
 public:
-	explicit EchoServer(int port) : port_(port) {}
+	explicit EchoServer(Port port) : port_(port) {}
 
 	void run() const {
 		SocketHandle server_socket(::socket(AF_INET, SOCK_STREAM, 0));
@@ -51,7 +52,7 @@ public:
 		sockaddr_in server_addr{};
 		server_addr.sin_family = AF_INET;
 		server_addr.sin_addr.s_addr = INADDR_ANY;
-		server_addr.sin_port = htons(port_);
+		server_addr.sin_port = port_.network_order();
 
 		if (::bind(server_socket.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
 			throw_errno("bind failed");
@@ -61,7 +62,7 @@ public:
 			throw_errno("listen failed");
 		}
 
-		std::cout << "Echo server on port " << port_ << " (Ctrl+C to stop)\n";
+		std::cout << "Echo server on port " << port_.value() << " (Ctrl+C to stop)\n";
 
 		for (;;) {
 			try {
@@ -102,7 +103,7 @@ private:
 	static constexpr size_t BufferSize = 1024;
 	static constexpr int Backlog = 5;
 
-	int port_;
+	Port port_;
 };
 
 
@@ -110,10 +111,10 @@ private:
 
 
 int main() {
-	constexpr int Port = 8080;
+	const Port port(8080);
 
 	try {
-		const EchoServer server(Port);
+		const EchoServer server(port);
 		server.run();
 	} catch (const std::exception& e) {
 		std::cerr << "Server error: " << e.what() << '\n';
