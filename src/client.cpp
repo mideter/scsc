@@ -6,8 +6,8 @@
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <system_error>
 
+#include "ipv4address.h"
 #include "sockethandle.h"
 
 
@@ -26,44 +26,42 @@ void print_errno(const std::string& message) {
 }  // namespace
 
 
-int main() {
-	try {
-		SocketHandle sock(::socket(AF_INET, SOCK_STREAM, 0));
+int main()
+try {
+	SocketHandle sock(::socket(AF_INET, SOCK_STREAM, 0));
 
-		sockaddr_in server_addr{};
-		server_addr.sin_family = AF_INET;
-		server_addr.sin_port = htons(kPort);
+	sockaddr_in server_addr{};
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(kPort);
 
-		if (::inet_pton(AF_INET, kServerIp, &server_addr.sin_addr) <= 0) {
-			print_errno("inet_pton failed");
-			return 1;
-		}
+	const IPv4Address server_ip(kServerIp);
+	server_addr.sin_addr = server_ip.value();
 
-		if (::connect(sock.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
-			print_errno("connect failed");
-			return 1;
-		}
-
-		const std::string message = "Hello, I want to get it back!";
-		if (::send(sock.get(), message.c_str(), message.size(), 0) < 0) {
-			print_errno("send failed");
-			return 1;
-		}
-
-		char buffer[1024] = {0};
-		const ssize_t bytes_received = ::recv(sock.get(), buffer, sizeof(buffer) - 1, 0);
-		if (bytes_received < 0) {
-			print_errno("recv failed");
-			return 1;
-		}
-
-		buffer[bytes_received] = '\0';
-		std::cout << "Server replied: " << buffer << '\n';
-
-		return 0;
-	} catch (const std::system_error& e) {
-		std::cerr << e.what() << '\n';
+	if (::connect(sock.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
+		print_errno("connect failed");
 		return 1;
 	}
+
+	const std::string message = "Hello, I want to get it back!";
+	if (::send(sock.get(), message.c_str(), message.size(), 0) < 0) {
+		print_errno("send failed");
+		return 1;
+	}
+
+	char buffer[1024] = {0};
+	const ssize_t bytes_received = ::recv(sock.get(), buffer, sizeof(buffer) - 1, 0);
+	if (bytes_received < 0) {
+		print_errno("recv failed");
+		return 1;
+	}
+
+	buffer[bytes_received] = '\0';
+	std::cout << "Server replied: " << buffer << '\n';
+
+	return 0;
+} 
+catch (const std::exception& e) {
+	std::cerr << e.what() << '\n';
+	return 1;
 }
 
