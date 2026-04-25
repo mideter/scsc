@@ -45,7 +45,7 @@ EchoServer::EchoServer(Port port)
 {}
 
 
-void EchoServer::run() const
+SocketHandle EchoServer::create_listen_socket() const
 {
 	SocketHandle server_socket(::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
 
@@ -53,6 +53,12 @@ void EchoServer::run() const
 	if (::setsockopt(server_socket.get(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 		throw_errno("setsockopt failed");
 
+	return server_socket;
+}
+
+
+void EchoServer::bind_and_listen(const SocketHandle& server_socket) const
+{
 	const ServerAddress server_address = ServerAddress::any(port_);
 	sockaddr_in server_addr = server_address.value();
 
@@ -61,19 +67,24 @@ void EchoServer::run() const
 
 	if (::listen(server_socket.get(), Backlog) < 0)
 		throw_errno("listen failed");
+}
 
-	std::cout << "Echo server on port " << port_.value() << " (Ctrl+C to stop)\n";
 
+SocketHandle EchoServer::accept_client(const SocketHandle& server_socket, sockaddr_in& client_addr) const
+{
+	socklen_t client_len = sizeof(client_addr);
+	return SocketHandle(::accept(server_socket.get(), reinterpret_cast<sockaddr*>(&client_addr), &client_len));
+}
+
+
+void EchoServer::serve_clients(const SocketHandle& server_socket) const
+{
 	for (;;) {
 		try {
 			sockaddr_in client_addr{};
-			socklen_t client_len = sizeof(client_addr);
-			SocketHandle client_socket(::accept(server_socket.get(), reinterpret_cast<sockaddr*>(&client_addr), &client_len));
+			SocketHandle client_socket = accept_client(server_socket, client_addr);
 
-			char ip[INET_ADDRSTRLEN] = {0};
-			::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
-			std::cout << "Client " << ip << ":" << ntohs(client_addr.sin_port) << " connected\n";
-
+			log_client_connected(client_addr);
 			handle_client(client_socket.get());
 		}
 		catch (const std::exception& e) {
@@ -82,6 +93,24 @@ void EchoServer::run() const
 
 		std::cout << "Client disconnected\n";
 	}
+}
+
+
+void EchoServer::log_client_connected(const sockaddr_in& client_addr)
+{
+	char ip[INET_ADDRSTRLEN] = {0};
+	::inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
+	std::cout << "Client " << ip << ":" << ntohs(client_addr.sin_port) << " connected\n";
+}
+
+
+void EchoServer::run() const
+{
+	SocketHandle server_socket = create_listen_socket();
+	bind_and_listen(server_socket);
+
+	std::cout << "Echo server on port " << port_.value() << " (Ctrl+C to stop)\n";
+	serve_clients(server_socket);
 }
 
 
