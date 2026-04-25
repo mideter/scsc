@@ -3,9 +3,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#include <cerrno>
-#include <system_error>
 #include <vector>
+
+#include "socketerror.h"
 
 
 EchoClient::EchoClient()
@@ -17,7 +17,7 @@ void EchoClient::connect(const ServerAddress& server_address)
 {
 	sockaddr_in server_addr = server_address.value();
 	if (::connect(socket_.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0)
-		throw std::system_error(errno, std::generic_category(), "connect failed");
+		throw SocketError("connect failed");
 }
 
 
@@ -33,10 +33,10 @@ void EchoClient::send(std::string_view message) const
 		);
 
 		if (sent < 0)
-			throw std::system_error(errno, std::generic_category(), "send failed");
+			throw SocketError("send failed");
 
 		if (sent == 0)
-			throw std::system_error(EPIPE, std::generic_category(), "send failed");
+			throw SocketError(EPIPE, "send failed");
 
 		total_sent += static_cast<std::size_t>(sent);
 	}
@@ -51,7 +51,7 @@ std::string EchoClient::receive(std::size_t max_bytes) const
 	std::vector<char> buffer(max_bytes + 1, '\0');
 	const ssize_t bytes_received = ::recv(socket_.get(), buffer.data(), max_bytes, 0);
 	if (bytes_received < 0)
-		throw std::system_error(errno, std::generic_category(), "recv failed");
+		throw SocketError("recv failed");
 
 	return std::string(buffer.data(), static_cast<std::size_t>(bytes_received));
 }
