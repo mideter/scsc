@@ -9,6 +9,7 @@
 #include <system_error>
 
 #include "port.h"
+#include "serveraddress.h"
 #include "sockethandle.h"
 
 
@@ -49,10 +50,8 @@ public:
 			throw_errno("setsockopt failed");
 		}
 
-		sockaddr_in server_addr{};
-		server_addr.sin_family = AF_INET;
-		server_addr.sin_addr.s_addr = INADDR_ANY;
-		server_addr.sin_port = port_.network_order();
+		const ServerAddress server_address = ServerAddress::any(port_);
+		sockaddr_in server_addr = server_address.value();
 
 		if (::bind(server_socket.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
 			throw_errno("bind failed");

@@ -9,6 +9,7 @@
 
 #include "ipv4address.h"
 #include "port.h"
+#include "serveraddress.h"
 #include "sockethandle.h"
 
 
@@ -30,13 +31,9 @@ void print_errno(const std::string& message) {
 int main()
 try {
 	SocketHandle sock(::socket(AF_INET, SOCK_STREAM, 0));
-
-	sockaddr_in server_addr{};
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = kPort.network_order();
-
 	const IPv4Address server_ip(kServerIp);
-	server_addr.sin_addr = server_ip.value();
+	const ServerAddress server_address(server_ip, kPort);
+	sockaddr_in server_addr = server_address.value();
 
 	if (::connect(sock.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
 		print_errno("connect failed");
