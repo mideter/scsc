@@ -47,7 +47,7 @@ EchoServer::EchoServer(Port port)
 
 void EchoServer::run() const
 {
-	SocketHandle server_socket(::socket(AF_INET, SOCK_STREAM, 0));
+	SocketHandle server_socket(::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
 
 	int opt = 1;
 	if (::setsockopt(server_socket.get(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)

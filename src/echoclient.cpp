@@ -9,7 +9,7 @@
 
 
 EchoClient::EchoClient()
-	: socket_(::socket(AF_INET, SOCK_STREAM, 0))
+	: socket_(::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))
 {}
 
 
