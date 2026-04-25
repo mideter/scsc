@@ -15,10 +15,11 @@ public:
 	void run() const;
 
 private:
-	SocketHandle create_listen_socket() const;
-	void bind_and_listen(const SocketHandle& server_socket) const;
+	SocketHandle 	create_listen_socket() const;
+	void 			bind_and_listen(const SocketHandle& server_socket) const;
 	ClientConnection accept_client(const SocketHandle& server_socket) const;
-	void serve_clients(const SocketHandle& server_socket) const;
+	void 			serve_clients(const SocketHandle& server_socket) const;
+	
 	static void log_client_connected(const ClientConnection& client_connection);
 	static void handle_client(const ClientConnection& client);
 
