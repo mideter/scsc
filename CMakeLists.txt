@@ -6,5 +6,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(server src/server.cpp src/sockethandle.cpp src/port.cpp src/serveraddress.cpp src/ipv4address.cpp)
-add_executable(client src/client.cpp src/sockethandle.cpp src/ipv4address.cpp src/port.cpp src/serveraddress.cpp)
+add_executable(client src/client.cpp src/echoclient.cpp src/sockethandle.cpp src/ipv4address.cpp src/port.cpp src/serveraddress.cpp)
 
