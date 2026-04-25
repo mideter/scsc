@@ -20,7 +20,7 @@ private:
 	ClientConnection accept_client(const SocketHandle& server_socket) const;
 	void serve_clients(const SocketHandle& server_socket) const;
 	static void log_client_connected(const ClientConnection& client_connection);
-	static void handle_client(int client_fd);
+	static void handle_client(const ClientConnection& client);
 
 	static constexpr std::size_t BufferSize = 1024;
 	static constexpr int Backlog = 5;

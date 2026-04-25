@@ -72,12 +72,12 @@ ClientConnection EchoServer::accept_client(const SocketHandle& server_socket) co
 
 void EchoServer::serve_clients(const SocketHandle& server_socket) const
 {
-	for (;;) {
+	while (true) {
 		try {
-			ClientConnection client_connection = accept_client(server_socket);
+			ClientConnection client = accept_client(server_socket);
 
-			log_client_connected(client_connection);
-			handle_client(client_connection.socket_fd());
+			log_client_connected(client);
+			handle_client(client);
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Client error: " << e.what() << '\n';
@@ -88,13 +88,13 @@ void EchoServer::serve_clients(const SocketHandle& server_socket) const
 }
 
 
-void EchoServer::log_client_connected(const ClientConnection& client_connection)
+void EchoServer::log_client_connected(const ClientConnection& client)
 {
 	std::cout
 		<< "Client "
-		<< client_connection.address().ip_string()
+		<< client.address().ip_string()
 		<< ":"
-		<< client_connection.address().port()
+		<< client.address().port()
 		<< " connected\n";
 }
 
@@ -109,9 +109,11 @@ void EchoServer::run() const
 }
 
 
-void EchoServer::handle_client(int client_fd)
+void EchoServer::handle_client(const ClientConnection& client)
 {
+	int client_fd = client.socket_fd();
 	char buffer[BufferSize];
+	
 	while (true) {
 		const ssize_t n = ::recv(client_fd, buffer, sizeof(buffer), 0);
 		
