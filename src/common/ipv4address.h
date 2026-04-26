@@ -12,5 +12,5 @@ public:
 private:
 	friend class ServerAddress;
 
-	in_addr address_{};
+	in_addr network_order_{};
 };

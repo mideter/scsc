@@ -14,9 +14,8 @@ private:
 	friend class ServerAddress;
 	friend std::ostream& operator<<(std::ostream& os, const Port& port);
 
-	in_port_t network_order() const noexcept;
-
 	uint16_t port_;
+	in_port_t network_order_;
 };
 
 

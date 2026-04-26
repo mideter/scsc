@@ -13,12 +13,7 @@ Port::Port(int port)
 		throw std::invalid_argument("invalid port value: " + std::to_string(port));
 
 	port_ = static_cast<uint16_t>(port);
-}
-
-
-in_port_t Port::network_order() const noexcept
-{
-	return htons(port_);
+	network_order_ = htons(port_);
 }
 
 

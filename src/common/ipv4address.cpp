@@ -8,9 +8,9 @@
 
 
 IPv4Address::IPv4Address(std::string address)
-	: address_{}
+	: network_order_{}
 {
-	const int result = ::inet_pton(AF_INET, address.c_str(), &address_);
+	const int result = ::inet_pton(AF_INET, address.c_str(), &network_order_);
 
 	if (result == -1)
 		throw std::system_error(errno, std::generic_category(), "inet_pton failed");
