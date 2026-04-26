@@ -9,6 +9,7 @@
 class IPv4 {
 public:
 	explicit IPv4(std::string address);
+	explicit IPv4(in_addr addr);
 
 private:
 	friend class ServerAddress;

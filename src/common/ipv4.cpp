@@ -21,6 +21,18 @@ IPv4::IPv4(std::string address)
 }
 
 
+IPv4::IPv4(in_addr addr)
+	: ip_{}
+	, network_order_{addr}
+{
+	char ip[INET_ADDRSTRLEN] = {0};
+	if (::inet_ntop(AF_INET, &network_order_, ip, sizeof(ip)) == nullptr)
+		throw std::runtime_error("failed to format IPv4 address");
+
+	ip_ = std::string(ip);
+}
+
+
 std::ostream& operator<<(std::ostream& os, const IPv4& ip) 
 {
 	return os << ip.ip_;
