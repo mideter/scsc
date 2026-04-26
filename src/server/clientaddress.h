@@ -2,8 +2,7 @@
 
 #include <netinet/in.h>
 
-#include <cstdint>
-#include <string>
+#include <iosfwd>
 
 
 class ClientAddress {
@@ -13,9 +12,11 @@ public:
 	sockaddr* sockaddr_ptr();
 	socklen_t sockaddr_size() const noexcept;
 
-	std::string ip_string() const;
-	uint16_t port() const noexcept;
-
 private:
+	friend std::ostream& operator<<(std::ostream& os, const ClientAddress& address);
+
 	sockaddr_in address_{};
 };
+
+
+std::ostream& operator<<(std::ostream& os, const ClientAddress& address);

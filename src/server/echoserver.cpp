@@ -89,12 +89,7 @@ void EchoServer::serve_clients(const SocketHandle& server_socket) const
 
 void EchoServer::log_client_connected(const ClientConnection& client)
 {
-	std::cout
-		<< "Client "
-		<< client.address().ip_string()
-		<< ":"
-		<< client.address().port()
-		<< " connected\n";
+	std::cout << "Client " << client.address() << " connected" << std::endl;
 }
 
 
