@@ -53,10 +53,9 @@ SocketHandle EchoServer::create_listen_socket() const
 
 void EchoServer::bind_and_listen(const SocketHandle& server_socket) const
 {
-	const ServerAddress server_address = ServerAddress::any(port_);
-	sockaddr_in server_addr = server_address.value();
+	ServerAddress server = ServerAddress::any(port_);
 
-	if (::bind(server_socket.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0)
+	if (::bind(server_socket.get(), reinterpret_cast<sockaddr*>(&server.address_), sizeof(server.address_)) < 0)
 		throw SocketError("bind failed");
 
 	if (::listen(server_socket.get(), Backlog) < 0)

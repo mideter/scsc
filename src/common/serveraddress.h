@@ -12,9 +12,12 @@ public:
 	
 	static ServerAddress any(Port port);
 
-	sockaddr_in value() const noexcept;
-
 private:
+	friend class EchoServer;
+	friend class EchoClient; 
+
 	IPv4Address ip_;
 	Port port_;
+
+	sockaddr_in address_{};
 };

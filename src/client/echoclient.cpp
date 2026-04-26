@@ -13,10 +13,9 @@ EchoClient::EchoClient()
 {}
 
 
-void EchoClient::connect(const ServerAddress& server_address)
+void EchoClient::connect(ServerAddress server)
 {
-	sockaddr_in server_addr = server_address.value();
-	if (::connect(socket_.get(), reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0)
+	if (::connect(socket_.get(), reinterpret_cast<sockaddr*>(&server.address_), sizeof(server.address_)) < 0)
 		throw SocketError("connect failed");
 }
 
