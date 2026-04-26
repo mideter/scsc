@@ -13,7 +13,7 @@ public:
 	static ClientConnection accept_from(const SocketHandle& server_socket);
 
 	const ClientAddress& address() const noexcept;
-	int socket_fd() const noexcept;
+	
 	bool recv_some(char* buffer, std::size_t len, std::size_t& received) const;
 	void send_all(const char* data, std::size_t len) const;
 

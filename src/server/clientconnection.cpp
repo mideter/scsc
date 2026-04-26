@@ -33,12 +33,6 @@ const ClientAddress& ClientConnection::address() const noexcept
 }
 
 
-int ClientConnection::socket_fd() const noexcept
-{
-	return socket_.get();
-}
-
-
 bool ClientConnection::recv_some(char* buffer, std::size_t len, std::size_t& received) const
 {
 	const ssize_t n = ::recv(socket_.get(), buffer, len, 0);
