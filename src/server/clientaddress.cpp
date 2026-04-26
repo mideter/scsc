@@ -10,12 +10,6 @@ ClientAddress::ClientAddress(sockaddr_in addr)
 {}
 
 
-ClientAddress ClientAddress::from_sockaddr_in(sockaddr_in addr)
-{
-	return ClientAddress(addr);
-}
-
-
 std::ostream& operator<<(std::ostream& os, const ClientAddress& address)
 {
 	return os << address.ip_ << ":" << address.port_;

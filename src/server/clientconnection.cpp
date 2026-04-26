@@ -22,7 +22,7 @@ ClientConnection ClientConnection::accept_from(const SocketHandle& server_socket
 								 reinterpret_cast<sockaddr*>(&peer),
 								 &peer_len));
 
-	return ClientConnection(std::move(socket), ClientAddress::from_sockaddr_in(peer));
+	return ClientConnection(std::move(socket), ClientAddress{peer});
 }
 
 

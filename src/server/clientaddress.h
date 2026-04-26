@@ -19,8 +19,6 @@ private:
 
 	explicit ClientAddress(sockaddr_in addr);
 
-	static ClientAddress from_sockaddr_in(sockaddr_in addr);
-
 	friend std::ostream& operator<<(std::ostream& os, const ClientAddress& address);
 
 	IPv4 ip_;
