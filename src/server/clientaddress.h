@@ -16,10 +16,9 @@ public:
 
 private:
 	friend class ClientConnection;
+	friend std::ostream& operator<<(std::ostream& os, const ClientAddress& address);
 
 	explicit ClientAddress(sockaddr_in addr);
-
-	friend std::ostream& operator<<(std::ostream& os, const ClientAddress& address);
 
 	IPv4 ip_;
 	Port port_;
