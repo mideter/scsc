@@ -9,10 +9,8 @@ class ClientAddress {
 public:
 	ClientAddress() = default;
 
-	sockaddr* sockaddr_ptr();
-	socklen_t sockaddr_size() const noexcept;
-
 private:
+	friend class ClientConnection;
 	friend std::ostream& operator<<(std::ostream& os, const ClientAddress& address);
 
 	sockaddr_in address_{};

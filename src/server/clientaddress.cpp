@@ -28,18 +28,6 @@ uint16_t port(const sockaddr_in& address)
 }  // namespace
 
 
-sockaddr* ClientAddress::sockaddr_ptr()
-{
-	return reinterpret_cast<sockaddr*>(&address_);
-}
-
-
-socklen_t ClientAddress::sockaddr_size() const noexcept
-{
-	return sizeof(address_);
-}
-
-
 std::ostream& operator<<(std::ostream& os, const ClientAddress& address)
 {
 	return os << ip_string(address.address_) << ":" << port(address.address_);
