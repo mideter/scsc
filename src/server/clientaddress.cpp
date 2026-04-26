@@ -28,7 +28,20 @@ uint16_t port(const sockaddr_in& address)
 }  // namespace
 
 
+ClientAddress::ClientAddress(sockaddr_in addr)
+	: ip_(ip_string(addr))
+	, port_(static_cast<int>(port(addr)))
+	, address_(addr)
+{}
+
+
+ClientAddress ClientAddress::from_sockaddr_in(sockaddr_in addr)
+{
+	return ClientAddress(addr);
+}
+
+
 std::ostream& operator<<(std::ostream& os, const ClientAddress& address)
 {
-	return os << ip_string(address.address_) << ":" << port(address.address_);
+	return os << address.ip_ << ":" << address.port_;
 }

@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 
 #include <string>
+#include <iosfwd>
 
 
 class IPv4 {
@@ -11,7 +12,11 @@ public:
 
 private:
 	friend class ServerAddress;
+	friend std::ostream& operator<<(std::ostream& os, const IPv4& ip); 
 
 	std::string ip_;
 	in_addr network_order_;
 };
+
+
+std::ostream& operator<<(std::ostream& os, const IPv4& ip); 

@@ -19,3 +19,9 @@ IPv4::IPv4(std::string address)
 	if (result == 0)
 		throw std::invalid_argument("invalid IPv4 address format: " + address);
 }
+
+
+std::ostream& operator<<(std::ostream& os, const IPv4& ip) 
+{
+	return os << ip.ip_;
+} 

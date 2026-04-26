@@ -16,14 +16,13 @@ ClientConnection::ClientConnection(SocketHandle socket, ClientAddress address)
 
 ClientConnection ClientConnection::accept_from(const SocketHandle& server_socket)
 {
-	ClientAddress client;
+	sockaddr_in peer{};
+	socklen_t peer_len = sizeof(peer);
+	SocketHandle socket(::accept(server_socket.get(),
+								 reinterpret_cast<sockaddr*>(&peer),
+								 &peer_len));
 
-	socklen_t client_len = sizeof(client.address_);
-	SocketHandle socket(::accept(server_socket.get(), 
-								 reinterpret_cast<sockaddr*>(&client.address_), 
-								 &client_len));
-
-	return ClientConnection(std::move(socket), std::move(client));
+	return ClientConnection(std::move(socket), ClientAddress::from_sockaddr_in(peer));
 }
 
 
