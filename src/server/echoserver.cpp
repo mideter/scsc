@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include <array>
 #include <iostream>
 
 #include "serveraddress.h"
@@ -75,9 +76,9 @@ void EchoServer::run() const
 
 void EchoServer::handle_client(const ClientConnection& client)
 {
-	char buffer[BufferSize];
+	std::array<char, BufferSize> buffer{};
 	std::size_t received = 0;
 	
-	while (client.recv_some(buffer, sizeof(buffer), received))
-		client.send_all(buffer, received);
+	while (client.recv_some(buffer.data(), buffer.size(), received))
+		client.send_all(buffer.data(), received);
 }
