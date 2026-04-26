@@ -18,9 +18,3 @@ IPv4Address::IPv4Address(std::string address)
 	if (result == 0)
 		throw std::invalid_argument("invalid IPv4 address format: " + address);
 }
-
-
-const in_addr& IPv4Address::value() const noexcept
-{
-	return address_;
-}

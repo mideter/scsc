@@ -6,7 +6,7 @@
 
 int main()
 try {
-	constexpr const char* version = "1.0.4";
+	constexpr const char* version = "1.0.5";
 	std::cout << "Starting Echo Server v" << version << '\n';
 
 	const EchoServer server(Port{8080});

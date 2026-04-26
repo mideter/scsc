@@ -9,8 +9,8 @@ class IPv4Address {
 public:
 	explicit IPv4Address(std::string address);
 
-	const in_addr& value() const noexcept;
-
 private:
+	friend class ServerAddress;
+
 	in_addr address_{};
 };

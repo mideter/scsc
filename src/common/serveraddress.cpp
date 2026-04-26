@@ -18,7 +18,7 @@ sockaddr_in ServerAddress::value() const noexcept
 {
 	sockaddr_in address{};
 	address.sin_family = AF_INET;
-	address.sin_addr = ip_.value();
+	address.sin_addr = ip_.address_;
 	address.sin_port = port_.network_order();
 	return address;
 }
