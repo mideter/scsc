@@ -39,17 +39,11 @@ void EchoServer::bind_and_listen(const SocketHandle& server_socket) const
 }
 
 
-ClientConnection EchoServer::accept_client(const SocketHandle& server_socket) const
-{
-	return ClientConnection::accept_from(server_socket);
-}
-
-
 void EchoServer::serve_clients(const SocketHandle& server_socket) const
 {
 	while (true) {
 		try {
-			ClientConnection client = accept_client(server_socket);
+			ClientConnection client = ClientConnection::accept_from(server_socket);
 
 			log_client_connected(client);
 			handle_client(client);
@@ -74,7 +68,7 @@ void EchoServer::run() const
 	SocketHandle server_socket = create_listen_socket();
 	bind_and_listen(server_socket);
 
-	std::cout << "Echo server on port " << port_ << " (Ctrl+C to stop)\n";
+	std::cout << "Echo server on port " << port_ << " (Ctrl+C to stop)" << std::endl;
 	serve_clients(server_socket);
 }
 
