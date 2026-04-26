@@ -17,6 +17,12 @@ Port::Port(int port)
 }
 
 
+Port::Port(in_port_t network_order)
+	: port_(ntohs(network_order))
+	, network_order_(network_order)
+{}
+
+
 std::ostream& operator<<(std::ostream& os, const Port& port)
 {
 	return os << port.port_;

@@ -9,6 +9,7 @@
 class Port {
 public:
 	explicit Port(int port);
+	explicit Port(in_port_t network_order);
 
 private:
 	friend class ServerAddress;

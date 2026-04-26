@@ -3,21 +3,9 @@
 #include <ostream>
 
 
-namespace {
-
-
-uint16_t port(const sockaddr_in& address)
-{
-	return ntohs(address.sin_port);
-}
-
-
-}  // namespace
-
-
 ClientAddress::ClientAddress(sockaddr_in addr)
-	: ip_(IPv4(addr.sin_addr))
-	, port_(static_cast<int>(port(addr)))
+	: ip_{addr.sin_addr}
+	, port_{addr.sin_port}
 	, address_(addr)
 {}
 
