@@ -12,5 +12,6 @@ public:
 private:
 	friend class ServerAddress;
 
-	in_addr network_order_{};
+	std::string ip_;
+	in_addr network_order_;
 };
