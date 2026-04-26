@@ -104,7 +104,7 @@ void EchoServer::run() const
 	SocketHandle server_socket = create_listen_socket();
 	bind_and_listen(server_socket);
 
-	std::cout << "Echo server on port " << port_.value() << " (Ctrl+C to stop)\n";
+	std::cout << "Echo server on port " << port_ << " (Ctrl+C to stop)\n";
 	serve_clients(server_socket);
 }
 

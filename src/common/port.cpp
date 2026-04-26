@@ -2,6 +2,7 @@
 
 #include <arpa/inet.h>
 
+#include <ostream>
 #include <stdexcept>
 #include <string>
 
@@ -15,13 +16,13 @@ Port::Port(int port)
 }
 
 
-uint16_t Port::value() const noexcept
-{
-	return port_;
-}
-
-
 in_port_t Port::network_order() const noexcept
 {
 	return htons(port_);
+}
+
+
+std::ostream& operator<<(std::ostream& os, const Port& port)
+{
+	return os << port.port_;
 }
