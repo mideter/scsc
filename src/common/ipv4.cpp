@@ -1,4 +1,4 @@
-#include "ipv4address.h"
+#include "ipv4.h"
 
 #include <arpa/inet.h>
 
@@ -7,7 +7,7 @@
 #include <system_error>
 
 
-IPv4Address::IPv4Address(std::string address)
+IPv4::IPv4(std::string address)
 	: network_order_{}
 {
 	const int result = ::inet_pton(AF_INET, address.c_str(), &network_order_);

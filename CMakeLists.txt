@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(common
   src/common/sockethandle.cpp
-  src/common/ipv4address.cpp
+  src/common/ipv4.cpp
   src/common/port.cpp
   src/common/serveraddress.cpp
 )

@@ -5,9 +5,9 @@
 #include <string>
 
 
-class IPv4Address {
+class IPv4 {
 public:
-	explicit IPv4Address(std::string address);
+	explicit IPv4(std::string address);
 
 private:
 	friend class ServerAddress;

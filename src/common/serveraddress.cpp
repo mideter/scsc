@@ -3,7 +3,7 @@
 #include <arpa/inet.h>
 
 
-ServerAddress::ServerAddress(IPv4Address ipv4, Port port)
+ServerAddress::ServerAddress(IPv4 ipv4, Port port)
 	: ip_(ipv4), port_(port)
 {
 	address_.sin_family = AF_INET;
@@ -14,5 +14,5 @@ ServerAddress::ServerAddress(IPv4Address ipv4, Port port)
 
 ServerAddress ServerAddress::any(Port port)
 {
-	return ServerAddress(IPv4Address("0.0.0.0"), port);
+	return ServerAddress(IPv4("0.0.0.0"), port);
 }
