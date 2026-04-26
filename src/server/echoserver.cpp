@@ -4,34 +4,10 @@
 #include <sys/socket.h>
 
 #include <iostream>
-#include <stdexcept>
 
 #include "serveraddress.h"
 #include "socketerror.h"
 #include "sockethandle.h"
-
-
-namespace {
-
-
-void send_all(int fd, const char* data, std::size_t len)
-{
-	std::size_t sent = 0;
-	while (sent < len) {
-		const ssize_t n = ::send(fd, data + sent, len - sent, 0);
-		
-		if (n < 0)
-			throw SocketError("send failed");
-		
-		if (n == 0)
-			throw std::runtime_error("send failed: connection closed");
-		
-		sent += static_cast<std::size_t>(n);
-	}
-}
-
-
-}  // namespace
 
 
 EchoServer::EchoServer(Port port)
@@ -105,18 +81,9 @@ void EchoServer::run() const
 
 void EchoServer::handle_client(const ClientConnection& client)
 {
-	int client_fd = client.socket_fd();
 	char buffer[BufferSize];
+	std::size_t received = 0;
 	
-	while (true) {
-		const ssize_t n = ::recv(client_fd, buffer, sizeof(buffer), 0);
-		
-		if (n < 0)
-			throw SocketError("recv failed");
-		
-		if (n == 0)
-			break;
-
-		send_all(client_fd, buffer, static_cast<std::size_t>(n));
-	}
+	while (client.recv_some(buffer, sizeof(buffer), received))
+		client.send_all(buffer, received);
 }
