@@ -1,15 +1,15 @@
 #include <iostream>
 
-#include "echoserver.h"
+#include "messengerserver.h"
 #include "port.h"
 
 
 int main()
 try {
-	constexpr const char* version = "1.0.9";
-	std::cout << "Starting Echo Server v" << version << '\n';
+	constexpr const char* version = "1.1.0";
+	std::cout << "Starting Messenger Server v" << version << '\n';
 
-	const EchoServer server(Port{8080});
+	const MessengerServer server(Port{8080});
 	
 	server.run();
 	

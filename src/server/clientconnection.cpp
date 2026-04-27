@@ -64,3 +64,9 @@ void ClientConnection::send_all(const char* data, std::size_t len) const
 		sent += static_cast<std::size_t>(n);
 	}
 }
+
+
+void ClientConnection::shutdown() const
+{
+	::shutdown(socket_.get(), SHUT_RDWR);
+}

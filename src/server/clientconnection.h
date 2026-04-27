@@ -16,6 +16,7 @@ public:
 	
 	bool recv_some(char* buffer, std::size_t len, std::size_t& received) const;
 	void send_all(const char* data, std::size_t len) const;
+	void shutdown() const;
 
 private:
 	SocketHandle socket_;

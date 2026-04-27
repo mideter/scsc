@@ -6,6 +6,10 @@
 #include "port.h"
 
 
+class MessengerServer;
+class MessengerClient;
+
+
 class ServerAddress {
 public:
 	ServerAddress(IPv4 ipv4, Port port);
@@ -13,8 +17,8 @@ public:
 	static ServerAddress any(Port port);
 
 private:
-	friend class EchoServer;
-	friend class EchoClient; 
+	friend class MessengerServer;
+	friend class MessengerClient;
 
 	IPv4 ip_;
 	Port port_;

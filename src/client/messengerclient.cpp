@@ -1,4 +1,4 @@
-#include "echoclient.h"
+#include "messengerclient.h"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -8,19 +8,19 @@
 #include "socketerror.h"
 
 
-EchoClient::EchoClient()
+MessengerClient::MessengerClient()
 	: socket_(::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))
 {}
 
 
-void EchoClient::connect(ServerAddress server)
+void MessengerClient::connect(ServerAddress server)
 {
 	if (::connect(socket_.get(), reinterpret_cast<sockaddr*>(&server.address_), sizeof(server.address_)) < 0)
 		throw SocketError("connect failed");
 }
 
 
-void EchoClient::send(std::string_view message) const
+void MessengerClient::send(std::string_view message) const
 {
 	std::size_t total_sent = 0;
 	while (total_sent < message.size()) {
@@ -42,7 +42,7 @@ void EchoClient::send(std::string_view message) const
 }
 
 
-std::string EchoClient::receive(std::size_t max_bytes) const
+std::string MessengerClient::receive(std::size_t max_bytes) const
 {
 	if (max_bytes == 0)
 		return {};
@@ -56,7 +56,7 @@ std::string EchoClient::receive(std::size_t max_bytes) const
 }
 
 
-std::string EchoClient::request_reply(std::string_view message, std::size_t max_bytes) const
+std::string MessengerClient::request_reply(std::string_view message, std::size_t max_bytes) const
 {
 	send(message);
 	return receive(max_bytes);

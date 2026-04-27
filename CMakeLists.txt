@@ -15,7 +15,7 @@ target_include_directories(common PUBLIC src/common)
 
 add_executable(server
   src/server/server.cpp
-  src/server/echoserver.cpp
+  src/server/messengerserver.cpp
   src/server/clientconnection.cpp
   src/server/clientaddress.cpp
 )
@@ -24,7 +24,7 @@ target_link_libraries(server PRIVATE common)
 
 add_executable(client
   src/client/client.cpp
-  src/client/echoclient.cpp
+  src/client/messengerclient.cpp
 )
 target_include_directories(client PRIVATE src/client)
 target_link_libraries(client PRIVATE common)

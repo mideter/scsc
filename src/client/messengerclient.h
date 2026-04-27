@@ -8,9 +8,9 @@
 #include "sockethandle.h"
 
 
-class EchoClient {
+class MessengerClient {
 public:
-	EchoClient();
+	MessengerClient();
 
 	void connect(ServerAddress server);
 	void send(std::string_view message) const;

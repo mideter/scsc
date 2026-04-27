@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "echoclient.h"
+#include "messengerclient.h"
 #include "ipv4.h"
 #include "port.h"
 #include "serveraddress.h"
@@ -18,7 +18,7 @@ int main()
 try {
 	const ServerAddress server_address(SingaporeServer::ip, SingaporeServer::port);
 	
-	EchoClient client;
+	MessengerClient client;
 	client.connect(server_address);
 	
 	const std::string message = "Hello, I want to get it back!";

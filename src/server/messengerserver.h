@@ -9,9 +9,9 @@
 class SocketHandle;
 
 
-class EchoServer {
+class MessengerServer {
 public:
-	explicit EchoServer(Port port);
+	explicit MessengerServer(Port port);
 
 	void run() const;
 
@@ -21,7 +21,8 @@ private:
 	void 			serve_clients(const SocketHandle& server_socket) const;
 	
 	static void log_client_connected(const ClientConnection& client_connection);
-	static void handle_client(const ClientConnection& client);
+	static void run_chat_session(const ClientConnection& first, const ClientConnection& second);
+	static void relay_messages(const ClientConnection& from, const ClientConnection& to);
 
 	static constexpr std::size_t BufferSize = 1024;
 	static constexpr int Backlog = 5;
