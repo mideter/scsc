@@ -28,7 +28,7 @@ void MessengerClient::send(std::string_view message) const
 			socket_.get(),
 			message.data() + total_sent,
 			message.size() - total_sent,
-			0
+			MSG_NOSIGNAL
 		);
 
 		if (sent < 0)
@@ -56,8 +56,7 @@ std::string MessengerClient::receive(std::size_t max_bytes) const
 }
 
 
-std::string MessengerClient::request_reply(std::string_view message, std::size_t max_bytes) const
+void MessengerClient::shutdown() const
 {
-	send(message);
-	return receive(max_bytes);
+	::shutdown(socket_.get(), SHUT_RDWR);
 }

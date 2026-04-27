@@ -15,7 +15,7 @@ public:
 	void connect(ServerAddress server);
 	void send(std::string_view message) const;
 	std::string receive(std::size_t max_bytes = 1024) const;
-	std::string request_reply(std::string_view message, std::size_t max_bytes = 1024) const;
+	void shutdown() const;
 
 private:
 	SocketHandle socket_;
